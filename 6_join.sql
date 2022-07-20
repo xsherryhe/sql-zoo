@@ -107,3 +107,149 @@ SELECT game.mdate,
 FROM game LEFT JOIN goal ON game.id = goal.matchid
   GROUP BY game.mdate, game.team1, game.team2
   ORDER BY game.mdate, game.id, game.team1, game.team2;
+
+
+
+--EXTRA: Old JOIN Tutorial
+
+--1. Show the athelete (who) and the country name for medal winners in 2000.
+
+SELECT who, country.name 
+FROM ttms JOIN country ON (ttms.country=country.id)
+  WHERE games = 2000
+
+
+--2. Show the who and the color of the medal for the medal winners from 'Sweden'.
+
+SELECT ttms.who, ttms.color 
+FROM ttms JOIN country ON ttms.country = country.id
+  WHERE country.name = 'Sweden';
+
+
+--3. Show the years in which 'China' won a 'gold' medal.
+
+SELECT ttms.games 
+FROM ttms JOIN country ON ttms.country = country.id
+  WHERE country.name = 'China'
+  AND ttms.color = 'gold';
+
+
+--4. Show who won medals in the 'Barcelona' games.
+
+SELECT ttws.who 
+FROM ttws JOIN games ON ttws.games = games.yr
+  WHERE games.city = 'Barcelona';
+
+
+--5. Show which city 'Jing Chen' won medals. Show the city and the medal color.
+
+SELECT games.city, ttws.color 
+FROM ttws JOIN games ON ttws.games = games.yr
+  WHERE ttws.who = 'Jing Chen';
+
+
+--6. Show who won the gold medal and the city.
+
+SELECT ttws.who, games.city 
+FROM ttws JOIN games ON ttws.games = games.yr
+  WHERE ttws.color = 'gold';
+
+
+--7. Show the games and color of the medal won by the team that includes 'Yan Sen'.
+
+SELECT ttmd.games, ttmd.color 
+FROM ttmd JOIN team ON ttmd.team = team.id
+  WHERE team.name = 'Yan Sen';
+
+
+--8. Show the 'gold' medal winners in 2004.
+
+SELECT team.name 
+FROM ttmd JOIN team ON ttmd.team = team.id
+  WHERE ttmd.games = 2004
+  AND ttmd.color = 'gold';
+
+
+--9. Show the name of each medal winner country 'FRA'.
+
+SELECT team.name 
+FROM ttmd JOIN team ON ttmd.team = team.id
+  WHERE ttmd.country = 'FRA';
+
+
+
+--EXTRA: Music Tutorial
+
+--1. Find the title and artist who recorded the song 'Alison'.
+
+SELECT title, artist 
+FROM album JOIN track ON (album.asin=track.album)
+  WHERE song = 'Alison'
+
+
+--2. Which artist recorded the song 'Exodus'?
+
+SELECT album.artist 
+FROM album JOIN track ON album.asin = track.album
+  WHERE track.song = 'Exodus';
+
+
+--3. Show the song for each track on the album 'Blur'
+
+SELECT track.song 
+FROM album JOIN track ON album.asin = track.album
+  WHERE album.title = 'Blur';
+
+
+--4. For each album show the title and the total number of track.
+
+SELECT title, COUNT(*) 
+FROM album JOIN track ON (asin=album)
+  GROUP BY title
+
+
+--5. For each album show the title and the total number of tracks containing the word 'Heart' (albums with no such tracks need not be shown).
+
+SELECT album.title, COUNT(*) 
+FROM album JOIN track ON album.asin = track.album
+  WHERE track.song LIKE '%Heart%'
+  GROUP BY album.title;
+
+
+--6. A "title track" is where the song is the same as the title. Find the title tracks.
+
+SELECT track.song 
+FROM album JOIN track ON album.asin = track.album
+  WHERE track.song = album.title;
+
+
+--7. An "eponymous" album is one where the title is the same as the artist (for example the album 'Blur' by the band 'Blur'). Show the eponymous albums.
+
+SELECT title FROM album
+  WHERE title = artist;
+
+
+--8. Find the songs that appear on more than 2 albums. Include a count of the number of times each shows up.
+
+SELECT track.song, COUNT(DISTINCT album.asin) 
+FROM album JOIN track ON album.asin = track.album
+  GROUP BY track.song
+  HAVING COUNT(DISTINCT album.asin) > 2;
+
+
+--9. A "good value" album is one where the price per track is less than 50 pence. Find the good value album - show the title, the price and the number of tracks.
+
+SELECT album.title, album.price, COUNT(*) 
+FROM album JOIN track ON album.asin = track.album
+  GROUP BY album.title, album.price
+  HAVING album.price / COUNT(*) < 0.5;
+
+
+--10. Wagner's Ring cycle has an imposing 173 tracks, Bing Crosby clocks up 101 tracks.
+--List albums so that the album with the most tracks is first. Show the title and the number of tracks
+--Where two or more albums have the same number of tracks you should order alphabetically
+
+SELECT album.title, COUNT(*) 
+FROM album JOIN track ON album.asin = track.album
+  GROUP BY album.asin, album.title
+  ORDER BY COUNT(*) DESC, album.title;
